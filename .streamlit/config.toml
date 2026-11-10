@@ -1,0 +1,3 @@
+[server]
+# Allow uploads up to 2 GB (default is 200 MB) so CIC-IoT-2023 files fit.
+maxUploadSize = 2000

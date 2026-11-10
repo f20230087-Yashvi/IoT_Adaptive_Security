@@ -71,17 +71,20 @@ def _finalise(df):
     return df
 
 
-def load_dataset(csv_path=None, label_column=None, attack_values=None):
-    """Return traffic with columns: timestamp, src_device, dst_device,
+def load_dataset(csv_path=None, label_column=None, attack_values=None, max_rows=None):
+    """max_rows: read only the first N rows (handy for very large CSVs).
+    Return traffic with columns: timestamp, src_device, dst_device,
     duration_s, packets, bytes, is_attack (0 = benign, 1 = attack), flow_id."""
     if not csv_path:
         return _finalise(demo_data())
 
-    df = pd.read_csv(csv_path, low_memory=False)
+    df = pd.read_csv(csv_path, low_memory=False, nrows=max_rows)
     if label_column:
-        if label_column not in df.columns:
+        # Match ignoring capitals/spaces, e.g. "label" finds "Label" in CIC-IoT-2023.
+        match = [c for c in df.columns if str(c).strip().lower() == label_column.strip().lower()]
+        if not match:
             raise ValueError(f"Label column '{label_column}' not found. Columns: {list(df.columns)}")
-        df = df.rename(columns={label_column: "label"})
+        df = df.rename(columns={match[0]: "label"})
     df = _rename_aliases(df)
     if "label" not in df.columns:
         raise ValueError("Could not find the label column. Use --label-column with the exact CSV column name.")

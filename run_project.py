@@ -16,6 +16,7 @@ def main():
     ap.add_argument("--csv", default=None, help="Path to a traffic CSV (omit to use demo data)")
     ap.add_argument("--label-column", default=None, help="Exact label column name in the CSV")
     ap.add_argument("--attack-values", default=None, help="Comma-separated attack label values")
+    ap.add_argument("--max-rows", type=int, default=None, help="Read only the first N rows of the CSV (for big files)")
     ap.add_argument("--security-weight", type=float, default=0.5, help="Security weight between 0 and 1")
     ap.add_argument("--out", default="outputs")
     args = ap.parse_args()
@@ -25,7 +26,7 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
-    traffic = load_dataset(args.csv, args.label_column, args.attack_values)
+    traffic = load_dataset(args.csv, args.label_column, args.attack_values, args.max_rows)
     twin = DigitalTwin(traffic)
     traffic.to_csv(out / "input_replay.csv", index=False)
 
